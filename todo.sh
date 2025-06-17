@@ -4,6 +4,21 @@
 FILE=tasks.csv
 
 
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+WHITE="\e[97m"
+BOLD="\e[1m"
+RESET="\e[0m"
+
+
+function print_header {
+    echo -e "${WHITE}==============================="
+    echo -e "        📋 TO-DO LIST              "
+    echo -e "===============================${RESET}"
+}
+
+
 function add {
     local priority="L"
     local title=""
@@ -13,7 +28,9 @@ function add {
             -t | --title)
                 shift
                 if [[ -z "$1" ]]; then
-                    echo  "Option -t|--title Needs a Parameter"
+                    echo -e "${WHITE}----------------------------------------------${RESET}"
+                    echo -e "${RED}❌ Error: Option -t|--title Needs a Parameter${RESET}"
+                    echo -e "${WHITE}----------------------------------------------${RESET}"
                     exit 1
                 fi
                 title="$1"
@@ -21,7 +38,9 @@ function add {
             -p | --priority)
                 shift
                 if [[ "$1" != "L" && "$1" != "M" && "$1" != "H" ]]; then
-                    echo "Option -p|--priority Only Accept L|M|H"
+                    echo -e "${WHITE}-----------------------------------------------------${RESET}"
+                    echo -e "${RED}❌Error: Option -p|--priority Only Accept L|M|H${RESET}"
+                    echo -e "${WHITE}-----------------------------------------------------${RESET}"
                     exit 1
                 fi
                 priority="$1"
@@ -31,57 +50,119 @@ function add {
     done
 
     if [[ -z "$title" ]]; then
-        echo "Error: Task title is required."
+        echo -e "${WHITE}----------------------------------------------${RESET}"
+        echo -e "${RED}❌Error: Task title is required.${RESET}"
+        echo -e "${WHITE}----------------------------------------------${RESET}"
         exit 1
     fi
     
     echo "0,$priority,\"$title\"" >> "$FILE"
+    echo -e "${GREEN}✅ Task added successfully!${RESET}"
+
 }
+
 
 function clear {
     echo "" > "$FILE"
+    echo -e "${WHITE}----------------------------------------${RESET}"
+    echo -e "${YELLOW}⚠️ All tasks cleared.${RESET}"
+    echo -e "${WHITE}----------------------------------------${RESET}"
 }
 
 
 function list {
-    if [[ ! -f "$FILE" ]]; then
-        echo "No tasks found."
+
+    if [[ ! -f "$FILE" || ! -s "$FILE" ]]; then
+        echo -e "${WHITE}-----------------------------------${RESET}"
+        echo -e "${YELLOW}No tasks found.${RESET}"
+        echo -e "${WHITE}-----------------------------------${RESET}"
         return
     fi
+
+    print_header
+    echo -e "${BOLD}ID | Status | Priority | Title${RESET}"
+    echo "------------------------------------------------"
+
     awk -F"," '{
-        status = ($1 == "1") ? "✅" : "❌"; 
-        print NR " | " status " | " $2 " | " $3
-  
+        status = ($1 == "1") ? "✅" : "❌"
+        priorities = ($2 == "H") ? "🔴 H" : ($2 == "M") ? "🟡 M": "🟢 L" 
+        printf "%2d | %s     | %s    | %s\n", NR, status, priorities, $3
+        total++
+        if ($1 == "1") done++
+    } END {
+        printf "\nTotal: %d     Done: %d    Todo: %d\n", total, done, total - done
     }' "$FILE"
 }
 
 function find_task {
     grep_term="$1"
-    awk -F "," '{ print NR " | " $1 " | " $2 " | " $3 }' "$FILE" | grep -- "$grep_term"
+    if [[ -z "$grep_term" ]]; then 
+        echo -e "${WHITE}----------------------------------------${RESET}"
+        echo -e "${RED}❌ Please provide a search term.${RESET}"
+        echo -e "${WHITE}----------------------------------------${RESET}"
+        return
+    fi
+
+    awk -F "," '{ print NR " | " $1 " | " $2 " | " $3 }' "$FILE" | grep --color=always "$grep_term"
 }
 
 
 function mark_down {
-    sed -i -e "${1}s/^0/1/" "$FILE"
+    if [[ -z "$1" ]]; then
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        echo -e "${RED}❌ Please provide the task ID to mark as done.${RESET}"
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        return
+    fi
 
+    sed -i -e "${1}s/^0/1/" "$FILE"
+    echo -e "${WHITE}----------------------------------------${RESET}"
+    echo -e "${GREEN}✅ Task $1 marked as done.${RESET}"
+    echo -e "${WHITE}----------------------------------------${RESET}"
 }
 
+
+
+function help {
+    echo -e "${WHITE}--------------------------------------------------------------------------------------------${RESET}"
+    echo -e "${BOLD}${BLUE}📘 TO-DO LIST HELP${RESET}"
+    echo -e "${BOLD}Usage:${RESET} ./todo.sh <command> [options]"
+    echo
+    echo -e "${BOLD}${YELLOW}🛠️  Task Commands${RESET}"
+    echo -e "  ${GREEN}add${RESET}         ➤ Add a new task"
+    echo -e "  ${GREEN}list${RESET}        ➤ Show all tasks"
+    echo -e "  ${GREEN}done <ID>${RESET}   ➤ Mark a task as done by its ID"
+    echo -e "  ${GREEN}clear${RESET}       ➤ Remove all tasks"
+    echo -e "  ${GREEN}find <text>${RESET} ➤ Search tasks by keyword"
+    echo
+
+    echo -e "${BOLD}${YELLOW}⚙️  Options (used with 'add')${RESET}"
+    echo -e "  ${BLUE}-t, --title${RESET}      ➤ Set task title (required)"
+    echo -e "  ${BLUE}-p, --priority${RESET}   ➤ Set priority: L (Low), M (Medium), H (High) [default: L]"
+    echo
+
+    echo -e "${BOLD}${YELLOW}💡 Examples:${RESET}"
+    echo -e "  ${CYAN}./todo.sh add -t \"Buy milk\" -p H${RESET}"
+    echo -e "  ${CYAN}./todo.sh done 2${RESET}"
+    echo -e "  ${CYAN}./todo.sh list${RESET}"
+    echo
+
+    echo -e "${BOLD}${YELLOW}ℹ️  Tip:${RESET} Use ${CYAN}./todo.sh help${RESET} to view this guide anytime."
+    echo -e "${WHITE}--------------------------------------------------------------------------------------------${RESET}"
+}
+
+
 case "$1" in
-    "add")
-        shift
-        add "$@";;
-    "clear")
-        clear;;
-    "list")
-        list;;
-    "find_task")
-        shift
-        find_task "$@";;
-    "done")
-        shift
-        mark_down "$@";;
+    "add") shift; add "$@";;
+    "clear") clear;;
+    "list") list;;
+    "find") shift; find_task "$@";;
+    "done") shift; mark_down "$@";;
+    "help") help;;
     *)
-        echo "Command Not Supported!";;  
+        echo -e "${WHITE}------------------------------------------------------------${RESET}"
+        echo -e "${YELLOW}Command Not Supported! Try './todo.sh help'${RESET}"
+        echo -e "${WHITE}------------------------------------------------------------${RESET}";;
 esac
 
 

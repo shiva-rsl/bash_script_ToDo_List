@@ -1,3 +1,5 @@
+ToDo(1)                             usercammands
+
 NAME
     todo - a simple command-line to-do list manager
 
@@ -8,18 +10,32 @@ DESRCIPTION
     A lightweight Bash-based task manager with support for priorities and status tracking.
 
 COMMANDS
-    add
+    add         Add a new task
+        -t, --title     Task title (required)
+        -p, --priority  Task priority: L, M, H (optional, default: L)
 
-    list
+    list        List all tasks
     
-    done
+    done <N>    Mark task number 
 
-    clear
+    clear       Clear all tasks
 
-    find-task
+    find-task <term>
+                search for tasks containing <term>
+
+    help        Show user guide commands
+
     -t, --title
 
     -p, --priority
 
+FILES
+    tasks.csv   The file where tasks are stored
+
 AUTHOR
     Written by Shiva Rasouli.
+
+VERSION
+    1.0
+
+                                    July 2025                                              ToDo(1)
