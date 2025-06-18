@@ -63,7 +63,7 @@ function add {
 
 
 function clear {
-    echo "" > "$FILE"
+    : > "$FILE"
     echo -e "${WHITE}----------------------------------------${RESET}"
     echo -e "${YELLOW}⚠️ All tasks cleared.${RESET}"
     echo -e "${WHITE}----------------------------------------${RESET}"
@@ -83,7 +83,7 @@ function list {
     echo -e "${BOLD}ID | Status | Priority | Title${RESET}"
     echo "------------------------------------------------"
 
-    awk -F"," '{
+    awk -F"," ' NF >= 3 {
         status = ($1 == "1") ? "✅" : "❌"
         priorities = ($2 == "H") ? "🔴 H" : ($2 == "M") ? "🟡 M": "🟢 L" 
         printf "%2d | %s     | %s    | %s\n", NR, status, priorities, $3
@@ -96,6 +96,7 @@ function list {
 
 function find_task {
     grep_term="$1"
+
     if [[ -z "$grep_term" ]]; then 
         echo -e "${WHITE}----------------------------------------${RESET}"
         echo -e "${RED}❌ Please provide a search term.${RESET}"
@@ -103,14 +104,50 @@ function find_task {
         return
     fi
 
-    awk -F "," '{ print NR " | " $1 " | " $2 " | " $3 }' "$FILE" | grep --color=always "$grep_term"
+    echo -e "${WHITE}------------------------------------------------------------------------------${RESET}"
+
+    awk -F "," -v term="$grep_term" '
+        NF >= 3 {
+            status = ($1 == "1") ? "✅" : "❌"
+            priority = ($2 == "H") ? "🔴 H" : ($2 == "M") ? "🟡 M" : "🟢 L"
+            id = NR
+            title = $3
+
+            if (term == id || tolower(title) ~ tolower(term)) {
+                printf "%2d | %s    | %s    | %s\n", id, status, priority, title
+            }
+        }
+    ' "$FILE"
+
+    echo -e "${WHITE}------------------------------------------------------------------------------${RESET}"
 }
 
 
+
 function mark_down {
-    if [[ -z "$1" ]]; then
+    if [[ -z "$1" || ! "$1" =~ ^[0-9]+$ ]]; then
         echo -e "${WHITE}----------------------------------------------------${RESET}"
-        echo -e "${RED}❌ Please provide the task ID to mark as done.${RESET}"
+        echo -e "${RED}❌ Please provide a valid numeric task ID.${RESET}"
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        return
+    fi
+
+    local task_id="$1"
+    local total_tasks
+    total_tasks=$(wc -l < "$FILE")
+
+    if [[ "$task_id" -lt 1 || "$task_id" -gt "$total_tasks" ]]; then
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        echo -e "${RED}❌ Task with ID $task_id not found.${RESET}"
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        return        
+    fi
+
+
+    current_status=$(awk -F',' "NR==$task_id { print \$1 }" "$FILE")
+    if [[ "$current_status" == "1" ]]; then
+        echo -e "${WHITE}----------------------------------------------------${RESET}"
+        echo -e "${YELLOW}⚠️ Task $task_id is already marked as done.${RESET}"
         echo -e "${WHITE}----------------------------------------------------${RESET}"
         return
     fi
@@ -119,6 +156,7 @@ function mark_down {
     echo -e "${WHITE}----------------------------------------${RESET}"
     echo -e "${GREEN}✅ Task $1 marked as done.${RESET}"
     echo -e "${WHITE}----------------------------------------${RESET}"
+
 }
 
 
