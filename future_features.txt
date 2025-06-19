@@ -1,0 +1,38 @@
+
+### ✅ **Practical Functional Features**
+
+1. **Due Dates** — Add a due date field and show tasks that are overdue.
+2. **Categories/Tags** — Group tasks by category (e.g. Work, Personal).
+3. **Edit Tasks** — Allow editing a task's title, priority, or status.
+4. **Delete Specific Tasks** — Remove a task by its number or title.
+5. **Sort Tasks** — Sort by priority, status, or due date.
+6. **Archive Completed Tasks** — Move done tasks to an archive file.
+7. **Task Progress Summary** — Show total tasks, done, pending.
+8. **Recurring Tasks** — Support repeated tasks (daily, weekly).
+
+---
+
+### 🎨 **UI/UX Features**
+
+1. **Color Legend** — Show a legend (e.g., 🔴 = High priority).
+2. **Animated CLI Feedback** — Simple loading dots or ASCII art banners.
+3. **Task Highlighting** — Highlight today’s tasks or overdue ones.
+4. **Confirmation Prompts** — Before deleting or marking tasks as done.
+5. **Minimalistic Dashboard View** — A simple, readable view of tasks on launch.
+
+---
+
+### 🔧 **Advanced Features (Optional for Intermediate+)**
+
+1. **Interactive Mode** — Use `select`, `read`, or `fzf` for menu-like interactions.
+2. **Export to JSON/Markdown** — Export task data to other formats.
+3. **Search by Priority/Status** — Not just keyword search.
+4. **Undo Last Action** — Restore last deleted or edited task.
+5. **Multifile Support** — Manage multiple to-do lists (e.g., `home.csv`, `work.csv`).
+6. **Encrypt/Password-Protect Tasks** — For private task lists.
+
+---
+
+### 🚀 Final Tip
+
+If you're learning, adding one or two new features every week is a great strategy.
