@@ -1,19 +1,15 @@
-1,H,"Submit report"
-0,M,"Call Alice"
-0,M,"Prepare dinner"
-0,H,"Finish Linux script"
-1,M,"Read 10 pages of a book"
-0,H,"Pay electricity bill"
-0,L,"Water the plants"
-0,M,"Backup laptop files"
-0,H,"Push latest changes to GitHub"
-0,M,"Clean the workspace"
-0,M,"Update resume with new project"
-0,L,"Sketch a simple charcoal drawing"
-1,L,"Read 10 pages of a historical book"
-0,L,"Clean up unused browser bookmarks"
-0,M,"Take a 10-minute break to stretch or walk"
-0,L,"Search and star a cool open-source project"
-0,M,"Write down three ideas for future projects"
-0,L,"Customize a bash prompt or terminal theme"
-0,L,"Task"
+1,H,Submit report
+0,M,Call Alice
+0,M,Prepare dinner
+0,H,Finish Linux script
+1,M,Read 10 pages of a book
+0,H,Pay electricity bill
+0,L,Water the plants
+0,M,Backup laptop files
+0,H,Push latest changes to GitHub
+0,L,Clean the workspace
+0,M,Update resume with new project
+1,L,Sketch a simple charcoal drawing
+0,L,Clean up unused browser bookmarks
+0,M,Take a 10-minute break to stretch or walk
+0,M,Write down three ideas for future projects
